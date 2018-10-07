@@ -1,0 +1,199 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Car License Plate</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <style>
+            body,html{
+                height: 100%;
+            }
+            .jumbotron{
+                height:100%;
+            }      
+        </style>
+    </head>
+    <body>
+        <div class="jumbotron">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12 d-flex justify-content-center">
+                        <div class="text-danger font-weight-bold" style="visibility: hidden;" id="checkValid">Invalid Format!</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                    </div>
+                    <div class="col-sm-8 d-flex justify-content-center">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label for="number">Car Number:</label>
+                                        <input type="text" class="form-control" id="initial" placeholder="1A">
+                                    </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="number">Car Number:</label>
+                                    <input type="text" class="form-control" id="number" placeholder="9999">
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="date">Date:</label>
+                                    <input type="date" class="form-control" id="date">
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label style="visibility:hidden;">Example Text</label>
+                                    <button onclick ="onClickMethod()" type="button" class="form-control btn btn-secondary">Find</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+
+                <div class="d-flex justify-content-center">
+
+                        <table class="table table-hover table-striped">
+                            <thead class="table-success">
+                                <th>#</th>
+                                <th>Car Number</th>
+                                <th>Time</th>
+                                <th >Date</th>
+                            </thead>
+                            <tbody id="tableBody">
+                                <tr>
+                                    <td>1</td>
+                                    <td>AA/888</td>
+                                    <td>23:08</td>
+                                    <td>23.4.2018</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>AA/888</td>
+                                    <td>23:08</td>
+                                    <td>23.4.2018</td>
+                                </tr>
+                                <tr>
+                                    <td>1</td>
+                                    <td>AA/888</td>
+                                    <td>23:08</td>
+                                    <td>23.4.2018</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                </div>
+            </div>
+        </div>
+
+        <script>
+        function onClickMethod(){
+            var tableBody = document.getElementById("tableBody");
+            while (tableBody.firstChild) {
+                 tableBody.removeChild(tableBody.firstChild);
+            }
+            var carInitial = document.getElementById("initial").value.toUpperCase();
+            var regexInitial = RegExp('^[A-Z]|[1-9][A-Z]$');
+            var validInitial = carInitial.length == 2 && regexInitial.test(carInitial);
+            var carNumber = document.getElementById("number").value;
+            var regexNumber = RegExp('^[0-9][0-9][0-9][0-9]');
+            var validNumber = regexNumber.test(carNumber) && carNumber.length == 4; 
+            var calendar = document.getElementById("date").value;
+            var chooseDate = calendar != "";
+            var okay = validInitial && validNumber && chooseDate;
+            console.log("Initial :"+carInitial+"Number :" + validNumber+"Date :" + chooseDate);
+            var validText = document.getElementById("checkValid");
+            if (carInitial == "" && carNumber == ""){
+                var date = new Date(calendar);
+                var day = date.getDate();
+                var month = date.getMonth()+1;
+                var year = date.getFullYear();
+                validText.style.visibility = "hidden";
+                var xhr = new XMLHttpRequest();
+                var url = "/getbydate?day="+day+"&month="+month+
+                            "&year="+year;
+                xhr.open("GET",url, true);
+                xhr.onload = function (e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                    var json = JSON.parse(xhr.responseText);
+                    createTable(tableBody,json);
+                    console.log(xhr.responseText.length);
+                    } else {
+                    console.error(xhr.statusText);
+                    }
+                }
+                };
+                xhr.onerror = function (e) {
+                console.error(xhr.statusText);
+                };
+                xhr.send(null);
+
+            }else if (okay) {
+                var date = new Date(calendar);
+                var day = date.getDate();
+                var month = date.getMonth()+1;
+                var year = date.getFullYear();
+                validText.style.visibility = "hidden";
+                var xhr = new XMLHttpRequest();
+                var url = "/getdata?initial="+carInitial+"&number="+carNumber+"&day="+day+"&month="+month+
+                            "&year="+year;
+                xhr.open("GET",url, true);
+                xhr.onload = function (e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                    var json = JSON.parse(xhr.responseText);
+                    createTable(tableBody,json);
+                    } else {
+                    console.error(xhr.statusText);
+                    }
+                }
+                };
+                xhr.onerror = function (e) {
+                console.error(xhr.statusText);
+                };
+                xhr.send(null);
+            } else {
+                validText.style.visibility = "visible";
+            }
+
+            
+        }
+
+        function createTable(tableBody,json){
+            for (var i = 0 ; i < json.length ; i++){
+                var row = document.createElement("tr");
+                var number = i+1;
+                number = number.toString();
+                var td1 = document.createElement("td");
+                td1.innerHTML = number;
+
+                var td2 = document.createElement("td");
+                td2.innerHTML = json[i].initial+"/"+json[i].number;
+
+                var td3 = document.createElement("td");
+                td3.innerHTML = json[i].hour+":"+json[i].minute;
+                var td4 = document.createElement("td");
+                td4.innerHTML = json[i].day +"."+json[i].month+"."+json[i].year;
+                row.appendChild(td1);
+                row.appendChild(td2);
+                row.appendChild(td3);
+                row.appendChild(td4);
+
+                tableBody.appendChild(row);
+            }
+        }
+        </script>
+
+    </body>
+</html>
+<!--
+                    
+-->
