@@ -43,5 +43,5 @@ app.get('/getbydate',function(req,res){
 });
 
 
-app.listen(port,"159.65.131.89");
+app.listen(port);
 console.log("Server is running at port :"+port);
