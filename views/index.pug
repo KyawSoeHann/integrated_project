@@ -62,7 +62,7 @@ html
       var calendar = document.getElementById("date").value;
       var chooseDate = calendar != "";
       var okay = validInitial && validNumber && chooseDate;
-      console.log("Initial :"+carInitial+"Number :" + validNumber+"Date :" + chooseDate);
+
       var validText = document.getElementById("checkValid");
       if (carInitial == "" && carNumber == ""){
       var date = new Date(calendar);
@@ -79,7 +79,7 @@ html
       if (xhr.status === 200) {
       var json = JSON.parse(xhr.responseText);
       createTable(tableBody,json);
-      console.log(xhr.responseText.length);
+
       } else {
       console.error(xhr.statusText);
       }
@@ -113,7 +113,6 @@ html
       console.error(xhr.statusText);
       };
       xhr.send(null);
-      alert(okay+"/"+day+"/"+month+"/"+year);
       } else {
       validText.style.visibility = "visible";
       }
