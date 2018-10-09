@@ -34,50 +34,48 @@ function insertData (initial,number,day,month,year,hour,minute,second,res){
 function getData(initial,number,day,month,year,res){
 
 	db.car.find({initial:initial,number:number,day:day,month:month,year:year},function(err,result){
-		console.log(result);
+
 		res.json(result);	
 });
 }
 
 function getByCarandHour(initial,number,hour,res){
 	db.car.find({initial:initial,number:number,hour:hour},function(err,result){
-		console.log(result);
+
 		res.json(result);
 	});
 }
 
 function getByHour(hour,res){
 	db.car.find({hour:hour},function(err,result){
-		console.log(result);
+
 		res.json(result);
 	});
 }
 
 function getByDateandHour(day,month,year,hour,res){
 	db.car.find({day:day,month:month,year:year,hour:hour},function(err,result){
-		console.log(result);
+
 		res.json(result);
 	});
 }
 
 function getByDate(day,month,year,res){
 	db.car.find({day:day,month:month,year:year},function(err,result){
-		console.log(result);
+
 		res.json(result);
 	});
 }
 
 function getFullData(initial,number,day,month,year,hour,res){
 	db.car.find({initial:initial,number:number,day:day,month:month,year:year,hour:hour},function(err,result){
-		console.log(result);
+
 		res.json(result);
 	});
 }
 
 function getByCar(initial,number,res){
 	db.car.find({initial:initial,number:number},function(err,result){
-		console.log("Car only JSON");
-		console.log(result);
 		res.json(result);
 	});
 	
