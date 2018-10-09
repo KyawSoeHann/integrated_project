@@ -31,27 +31,68 @@ function insertData (initial,number,day,month,year,hour,minute,second,res){
 		res.status(200).end();
 });
 }
-
 function getData(initial,number,day,month,year,res){
 
-	if (initial == "" && number == ""){
-		db.car.find({day:day,month:month,year:year},function(err,result){
-
-			res.json(result);
-		});
-	}else {
-		db.car.find({initial:initial,number:number,day:day,month:month,year:year},function(err,result){
-
-			res.json(result);
-		});
-	}
-
-
+	db.car.find({initial:initial,number:number,day:day,month:month,year:year},function(err,result){
+		console.log(result);
+		res.json(result);	
+});
 }
+
+function getByCarandHour(initial,number,hour,res){
+	db.car.find({initial:initial,number:number,hour:hour},function(err,result){
+		console.log(result);
+		res.json(result);
+	});
+}
+
+function getByHour(hour,res){
+	db.car.find({hour:hour},function(err,result){
+		console.log(result);
+		res.json(result);
+	});
+}
+
+function getByDateandHour(day,month,year,hour,res){
+	db.car.find({day:day,month:month,year:year,hour:hour},function(err,result){
+		console.log(result);
+		res.json(result);
+	});
+}
+
+function getByDate(day,month,year,res){
+	db.car.find({day:day,month:month,year:year},function(err,result){
+		console.log(result);
+		res.json(result);
+	});
+}
+
+function getFullData(initial,number,day,month,year,hour,res){
+	db.car.find({initial:initial,number:number,day:day,month:month,year:year,hour:hour},function(err,result){
+		console.log(result);
+		res.json(result);
+	});
+}
+
+function getByCar(initial,number,res){
+	db.car.find({initial:initial,number:number},function(err,result){
+		console.log("Car only JSON");
+		console.log(result);
+		res.json(result);
+	});
+	
+}
+
 
 
 module.exports.getData = getData;
 module.exports.insertData = insertData;
+module.exports.getByCar = getByCar;
+module.exports.getByCarandHour = getByCarandHour;
+module.exports.getByHour = getByHour;
+module.exports.getByDateandHour = getByDateandHour;
+module.exports.getByDate = getByDate;
+module.exports.getFullData = getFullData;
 // db.car.findAndModify({query:{initial:"5A"},update:{$set:{number:"9999"}}},function(err,doc,lastErrorObject){
 // 	console.log("Update Successfully!");
 // });

@@ -17,26 +17,28 @@ html
           .col-sm-12.d-flex.justify-content-center
             #checkValid.text-danger.font-weight-bold(style='visibility: hidden;') Invalid Format!
         .row
-          .col-sm-2
-          .col-sm-8.d-flex.justify-content-center
+          .col-sm-12.d-flex.justify-content-center
             .row
+              .col-sm-2
+                .form-group
+                  label(for='number') Code:
+                  input#initial.form-control(type='text', placeholder='Code No (1A)')
               .col-sm-3
                 .form-group
                   label(for='number') Car Number:
-                  input#initial.form-control(type='text', placeholder='1A')
-              .col-sm-3
+                  input#number.form-control(type='text', placeholder='Number (9999)')
+              .col-sm-2
                 .form-group
-                  label(for='number') Car Number:
-                  input#number.form-control(type='text', placeholder='9999')
+                  label(for='number') Hour:
+                  input#hour.form-control(type='text', placeholder='24 hour format')
               .col-sm-3
                 .form-group
                   label(for='date') Date:
                   input#date.form-control(type='date')
-              .col-sm-3
+              .col-sm-2
                 .form-group
                   label(style='visibility:hidden;') Example Text
                   button.form-control.btn.btn-secondary(onclick='onClickMethod()', type='button') Find
-          .col-sm-2
       .container-fluid
         .d-flex.justify-content-center
           table.table.table-hover.table-striped
@@ -47,6 +49,21 @@ html
                 th Time
                 th Date
             tbody#tableBody
+              tr
+                td 1
+                td AA/888
+                td 23:08
+                td 23.4.2018
+              tr
+                td 1
+                td AA/888
+                td 23:08
+                td 23.4.2018
+              tr
+                td 1
+                td AA/888
+                td 23:08
+                td 23.4.2018
     script.
       function onClickMethod(){
       var tableBody = document.getElementById("tableBody");
@@ -54,56 +71,67 @@ html
       tableBody.removeChild(tableBody.firstChild);
       }
       var carInitial = document.getElementById("initial").value.toUpperCase();
-      var regexInitial = RegExp('^[A-Z]|[1-9][A-Z]$');
-      var validInitial = carInitial.length == 2 && regexInitial.test(carInitial);
       var carNumber = document.getElementById("number").value;
-      var regexNumber = RegExp('^[0-9][0-9][0-9][0-9]');
-      var validNumber = regexNumber.test(carNumber) && carNumber.length == 4;
       var calendar = document.getElementById("date").value;
-      var chooseDate = calendar != "";
-      var okay = validInitial && validNumber && chooseDate;
-
+      var hour = document.getElementById("hour").value;
       var validText = document.getElementById("checkValid");
+      var url = "";
       if (carInitial == "" && carNumber == ""){
       var date = new Date(calendar);
       var day = date.getDate();
       var month = date.getMonth()+1;
       var year = date.getFullYear();
       validText.style.visibility = "hidden";
-      var xhr = new XMLHttpRequest();
-      var url = "/getbydate?day="+day+"&month="+month+
+      if (hour == "" && calendar != ""){
+      url = "/getbydate?day="+day+"&month="+month+
       "&year="+year;
-      xhr.open("GET",url, true);
-      xhr.onload = function (e) {
-      if (xhr.readyState === 4) {
-      if (xhr.status === 200) {
-      var json = JSON.parse(xhr.responseText);
-      createTable(tableBody,json);
-
-      } else {
-      console.error(xhr.statusText);
+      console.log("Date Only");
       }
+      else if (hour != "" && calendar == ""){
+      url = "/getbyhour?hour="+hour;
+      console.log("Hour only");
       }
-      };
-      xhr.onerror = function (e) {
-      console.error(xhr.statusText);
-      };
-      xhr.send(null);
-      }else if (okay) {
+      else{
+      url ="/getbydateandhour?day="+day+"&month="+month+
+      "&year="+year+"&hour="+hour;
+      console.log("Date and Hour")
+      }
+      }else if (carInitial !="" && carNumber !="" && hour == "" && calendar != "") {
       var date = new Date(calendar);
       var day = date.getDate();
       var month = date.getMonth()+1;
       var year = date.getFullYear();
       validText.style.visibility = "hidden";
-      var xhr = new XMLHttpRequest();
-      var url = "/getdata?initial="+carInitial+"&number="+carNumber+"&day="+day+"&month="+month+
+      url = "/getbycaranddate?initial="+carInitial+"&number="+carNumber+"&day="+day+"&month="+month+
       "&year="+year;
+      console.log("Car No and Date");
+      }else if (carInitial !="" && carNumber !="" && calendar == "" && hour == ""){
+      url = "/getbycar?initial="+carInitial+"&number="+carNumber;
+      console.log("Car No Only");
+      }else if (carInitial != "" && carNumber != "" && hour != "" && calendar != ""){
+      var date = new Date(calendar);
+      var day = date.getDate();
+      var month = date.getMonth()+1;
+      var year = date.getFullYear();
+      url = "/getfulldata?initial="+carInitial+"&number="+carNumber+"&day="+day+"&month="+month+
+      "&year="+year+"&hour="+hour;
+      console.log("Full Find");
+      }else if (carInitial != "" && carNumber != "" && hour != "" && calendar == ""){
+      url = "/getbycarandhour?initial="+carInitial+"&number="+carNumber+"&hour="+hour;
+      console.log("Car No and Hour");
+      }
+      ajaxSend(url,tableBody);
+      }
+      function ajaxSend(url,tableBody){
+      var xhr = new XMLHttpRequest();
       xhr.open("GET",url, true);
       xhr.onload = function (e) {
       if (xhr.readyState === 4) {
+      console.log("Ajax");
       if (xhr.status === 200) {
       var json = JSON.parse(xhr.responseText);
       createTable(tableBody,json);
+      console.log(xhr.responseText.length);
       } else {
       console.error(xhr.statusText);
       }
@@ -113,9 +141,6 @@ html
       console.error(xhr.statusText);
       };
       xhr.send(null);
-      } else {
-      validText.style.visibility = "visible";
-      }
       }
       function createTable(tableBody,json){
       for (var i = 0 ; i < json.length ; i++){
